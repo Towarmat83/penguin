@@ -2,7 +2,7 @@
 
 input_dir="extracted_segments"
 output_dir="analysis_results"
-mkdir -p "$output_dir/individual_reports"  # Dossier pour chaque rapport individuel
+mkdir -p "$output_dir/individual_reports"  # Dossier pour les rapports individuels
 output_file="$output_dir/all_segments_analysis.txt"
 
 echo "Début de l'analyse des segments..."  
@@ -14,10 +14,17 @@ for segment in "$input_dir"/*.bin; do
 
     echo "Analyse du fichier : $segment_name"
 
-    # Exécute `file` et `strings`, et enregistre les sorties
+    # Vérifier l'entropie du fichier
+    entropy=$(ent "$segment" 2>/dev/null | grep "Entropy" | awk '{print $3}')
+
+    # Exécute `file`, `strings`, `ent`, et enregistre les sorties
     {
         echo "=== FILE OUTPUT ==="
         file "$segment"
+        
+        echo -e "\n=== ENTROPY OUTPUT ==="
+        echo "Entropie : $entropy bits/octet"
+
         echo -e "\n=== STRINGS OUTPUT ==="
         strings "$segment"
     } > "$report_file"
@@ -28,4 +35,3 @@ for segment in "$input_dir"/*.bin; do
 done
 
 echo "Analyse terminée ! Résultats enregistrés dans '$output_dir'."
-
